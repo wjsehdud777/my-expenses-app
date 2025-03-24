@@ -1,5 +1,11 @@
+import CreateExpense from "../components/CreateExpense";
+
 const Home = () => {
-  return <div>Home</div>;
+  return (
+    <div>
+      <CreateExpense />
+    </div>
+  );
 };
 
 export default Home;

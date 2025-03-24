@@ -1,5 +1,28 @@
 const CreateExpense = () => {
-  return <div>날짜,항목,금액,내용의 input들과 저장 button이 존재할 컴포넌트</div>;
+  return (
+    <div className="bg-[#e7e7e7]">
+      <form className="flex flex-row justify-center items-center space-y-4">
+        <div>
+          <p>날짜:</p>
+          <input className="mt-2 p-2 border rounded" type="date" />
+        </div>
+        <div>
+          <p>항목:</p>
+          <input className="mt-2 p-2 border rounded" type="text" />
+        </div>
+        <div>
+          <p>금액:</p>
+          <input className="mt-2 p-2 border rounded" type="number" />
+        </div>
+        <div>
+          <p>내용:</p>
+          <input className="mt-2 p-2 border rounded" type="text" />
+        </div>
+
+        <button className="mt-4 p-2 bg-red-700 text-white rounded hover:bg-red-500 transition-colors duration-300 cursor-pointer">저장</button>
+      </form>
+    </div>
+  );
 };
 
 export default CreateExpense;
