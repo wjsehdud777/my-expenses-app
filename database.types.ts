@@ -11,22 +11,25 @@ export type Database = {
     Tables: {
       todos: {
         Row: {
-          completed: boolean
-          created_at: string
-          id: number
-          title: string
+          amount: number
+          date: string
+          description: string
+          id: string
+          item: string
         }
         Insert: {
-          completed?: boolean
-          created_at?: string
-          id?: number
-          title: string
+          amount: number
+          date: string
+          description: string
+          id?: string
+          item: string
         }
         Update: {
-          completed?: boolean
-          created_at?: string
-          id?: number
-          title?: string
+          amount?: number
+          date?: string
+          description?: string
+          id?: string
+          item?: string
         }
         Relationships: []
       }
