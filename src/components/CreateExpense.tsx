@@ -1,4 +1,5 @@
 import { useState, ChangeEvent, MouseEvent } from "react";
+import { supabase } from "../utils/supabase";
 
 const CreateExpense = () => {
   const [expenses, setExpenses] = useState<
@@ -25,7 +26,7 @@ const CreateExpense = () => {
     setInputDescription(e.target.value);
   };
 
-  const UploadHandler = (e: MouseEvent<HTMLButtonElement>) => {
+  const UploadHandler = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (inputDate.trim() && inputItem.trim() && inputAmount > 0) {
@@ -36,12 +37,24 @@ const CreateExpense = () => {
         description: inputDescription,
       };
 
-      setExpenses((prevState) => [newExpense, ...prevState]);
+      try {
+        const { data, error } = await supabase
+          .from("todos")
+          .insert([newExpense]);
 
-      setInputDate("");
-      setInputItem("");
-      setInputAmount(0);
-      setInputDescription("");
+        if (error) {
+          console.error("데이터 삽입 오류!", error);
+        } else {
+          setExpenses((prevState) => [newExpense, ...prevState]);
+
+          setInputDate("");
+          setInputItem("");
+          setInputAmount(0);
+          setInputDescription("");
+        }
+      } catch (error) {
+        console.error("데이터 삽입 오류!", error);
+      }
     }
   };
 
