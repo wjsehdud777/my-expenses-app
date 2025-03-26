@@ -1,14 +1,39 @@
-import { useState, ChangeEvent, MouseEvent } from "react";
+import { useState, ChangeEvent, MouseEvent, useEffect } from "react";
 import { supabase } from "../utils/supabase";
 
 const CreateExpense = () => {
   const [expenses, setExpenses] = useState<
-    { date: string; item: string; amount: number; description: string }[]
+    {
+      id: number;
+      date: string;
+      item: string;
+      amount: number;
+      description: string;
+    }[]
   >([]);
+
   const [inputDate, setInputDate] = useState<string>("");
   const [inputItem, setInputItem] = useState<string>("");
   const [inputAmount, setInputAmount] = useState<number>(0);
   const [inputDescription, setInputDescription] = useState<string>("");
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const { data, error } = await supabase.from("todos").select("*");
+
+        if (error) {
+          console.error("지출 내역 불러오기 오류", error);
+        } else {
+          setExpenses(data);
+        }
+      } catch (error) {
+        console.error("지출 내역 불러오기 오류", error);
+      }
+    };
+
+    fetchExpenses();
+  }, []);
 
   const inputDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputDate(e.target.value);
@@ -45,8 +70,7 @@ const CreateExpense = () => {
         if (error) {
           console.error("데이터 삽입 오류!", error);
         } else {
-          setExpenses((prevState) => [newExpense, ...prevState]);
-
+          setExpenses((prevState) => [data[0], ...prevState]);
           setInputDate("");
           setInputItem("");
           setInputAmount(0);
@@ -55,6 +79,22 @@ const CreateExpense = () => {
       } catch (error) {
         console.error("데이터 삽입 오류!", error);
       }
+    }
+  };
+
+  const deleteExpense = async (id: number) => {
+    try {
+      const { error } = await supabase.from("todos").delete().match({ id });
+
+      if (error) {
+        console.error("데이터 삭제 오류!", error);
+      } else {
+        setExpenses((prevState) =>
+          prevState.filter((expense) => expense.id !== id)
+        );
+      }
+    } catch (error) {
+      console.error("데이터 삭제 오류!", error);
     }
   };
 
@@ -106,12 +146,20 @@ const CreateExpense = () => {
         </button>
       </form>
       <div className="flex flex-col justify-center items-center">
-        {expenses.map((expense, id) => {
+        {expenses.map((expense) => {
           return (
-            <p key={id}>
-              {expense.date} / {expense.item} / {expense.amount} /{" "}
-              {expense.description}
-            </p>
+            <div key={expense.id} className="flex items-center space-x-4">
+              <p>
+                {expense.date} / {expense.item} / {expense.amount} /{" "}
+                {expense.description}
+              </p>
+              <button
+                onClick={() => deleteExpense(expense.id)}
+                className="text-red-600 hover:text-red-400"
+              >
+                삭제
+              </button>
+            </div>
           );
         })}
       </div>
