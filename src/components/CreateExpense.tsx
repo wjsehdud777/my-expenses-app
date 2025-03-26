@@ -17,21 +17,21 @@ const CreateExpense = () => {
   const [inputAmount, setInputAmount] = useState<number>(0);
   const [inputDescription, setInputDescription] = useState<string>("");
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const { data, error } = await supabase.from("todos").select("*");
+  const fetchExpenses = async () => {
+    try {
+      const { data, error } = await supabase.from("todos").select("*");
 
-        if (error) {
-          console.error("지출 내역 불러오기 오류", error);
-        } else {
-          setExpenses(data);
-        }
-      } catch (error) {
+      if (error) {
         console.error("지출 내역 불러오기 오류", error);
+      } else {
+        setExpenses(data);
       }
-    };
+    } catch (error) {
+      console.error("지출 내역 불러오기 오류", error);
+    }
+  };
 
+  useEffect(() => {
     fetchExpenses();
   }, []);
 
@@ -70,7 +70,7 @@ const CreateExpense = () => {
         if (error) {
           console.error("데이터 삽입 오류!", error);
         } else {
-          setExpenses((prevState) => [data[0], ...prevState]);
+          fetchExpenses();
           setInputDate("");
           setInputItem("");
           setInputAmount(0);
@@ -89,9 +89,7 @@ const CreateExpense = () => {
       if (error) {
         console.error("데이터 삭제 오류!", error);
       } else {
-        setExpenses((prevState) =>
-          prevState.filter((expense) => expense.id !== id)
-        );
+        fetchExpenses();
       }
     } catch (error) {
       console.error("데이터 삭제 오류!", error);
@@ -146,22 +144,20 @@ const CreateExpense = () => {
         </button>
       </form>
       <div className="flex flex-col justify-center items-center">
-        {expenses.map((expense) => {
-          return (
-            <div key={expense.id} className="flex items-center space-x-4">
-              <p>
-                {expense.date} / {expense.item} / {expense.amount} /{" "}
-                {expense.description}
-              </p>
-              <button
-                onClick={() => deleteExpense(expense.id)}
-                className="text-red-600 hover:text-red-400"
-              >
-                삭제
-              </button>
-            </div>
-          );
-        })}
+        {expenses.map((expense) => (
+          <div key={expense.id} className="flex items-center space-x-4">
+            <p>
+              {expense.date} / {expense.item} / {expense.amount} /{" "}
+              {expense.description}
+            </p>
+            <button
+              onClick={() => deleteExpense(expense.id)}
+              className="text-red-600 hover:text-red-400"
+            >
+              삭제
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
