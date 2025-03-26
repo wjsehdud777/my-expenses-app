@@ -143,16 +143,25 @@ const CreateExpense = () => {
           저장
         </button>
       </form>
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center space-y-4 mt-6">
         {expenses.map((expense) => (
-          <div key={expense.id} className="flex items-center space-x-4">
-            <p>
-              {expense.date} / {expense.item} / {expense.amount} /{" "}
-              {expense.description}
-            </p>
+          <div
+            key={expense.id}
+            className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg flex justify-between items-center"
+          >
+            <div className="flex flex-col space-y-2">
+              <p className="text-xl font-semibold text-gray-800">
+                {expense.item}
+              </p>
+              <p className="text-sm text-gray-500">{expense.date}</p>
+              <p className="text-lg font-medium text-gray-900">
+                {expense.amount} 원
+              </p>
+              <p className="text-sm text-gray-600">{expense.description}</p>
+            </div>
             <button
               onClick={() => deleteExpense(expense.id)}
-              className="text-red-600 hover:text-red-400"
+              className="text-red-600 hover:text-red-400 p-2 rounded-lg transition-colors duration-300"
             >
               삭제
             </button>
