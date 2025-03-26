@@ -1,14 +1,39 @@
-import { useState, ChangeEvent, MouseEvent } from "react";
+import { useState, ChangeEvent, MouseEvent, useEffect } from "react";
 import { supabase } from "../utils/supabase";
 
 const CreateExpense = () => {
   const [expenses, setExpenses] = useState<
-    { date: string; item: string; amount: number; description: string }[]
+    {
+      id: number;
+      date: string;
+      item: string;
+      amount: number;
+      description: string;
+    }[]
   >([]);
+
   const [inputDate, setInputDate] = useState<string>("");
   const [inputItem, setInputItem] = useState<string>("");
   const [inputAmount, setInputAmount] = useState<number>(0);
   const [inputDescription, setInputDescription] = useState<string>("");
+
+  const fetchExpenses = async () => {
+    try {
+      const { data, error } = await supabase.from("todos").select("*");
+
+      if (error) {
+        console.error("지출 내역 불러오기 오류", error);
+      } else {
+        setExpenses(data);
+      }
+    } catch (error) {
+      console.error("지출 내역 불러오기 오류", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
 
   const inputDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputDate(e.target.value);
@@ -45,8 +70,7 @@ const CreateExpense = () => {
         if (error) {
           console.error("데이터 삽입 오류!", error);
         } else {
-          setExpenses((prevState) => [newExpense, ...prevState]);
-
+          fetchExpenses();
           setInputDate("");
           setInputItem("");
           setInputAmount(0);
@@ -55,6 +79,20 @@ const CreateExpense = () => {
       } catch (error) {
         console.error("데이터 삽입 오류!", error);
       }
+    }
+  };
+
+  const deleteExpense = async (id: number) => {
+    try {
+      const { error } = await supabase.from("todos").delete().match({ id });
+
+      if (error) {
+        console.error("데이터 삭제 오류!", error);
+      } else {
+        fetchExpenses();
+      }
+    } catch (error) {
+      console.error("데이터 삭제 오류!", error);
     }
   };
 
@@ -105,15 +143,30 @@ const CreateExpense = () => {
           저장
         </button>
       </form>
-      <div className="flex flex-col justify-center items-center">
-        {expenses.map((expense, id) => {
-          return (
-            <p key={id}>
-              {expense.date} / {expense.item} / {expense.amount} /{" "}
-              {expense.description}
-            </p>
-          );
-        })}
+      <div className="flex flex-col justify-center items-center space-y-4 mt-6">
+        {expenses.map((expense) => (
+          <div
+            key={expense.id}
+            className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg flex justify-between items-center"
+          >
+            <div className="flex flex-col space-y-2">
+              <p className="text-xl font-semibold text-gray-800">
+                {expense.item}
+              </p>
+              <p className="text-sm text-gray-500">{expense.date}</p>
+              <p className="text-lg font-medium text-gray-900">
+                {expense.amount} 원
+              </p>
+              <p className="text-sm text-gray-600">{expense.description}</p>
+            </div>
+            <button
+              onClick={() => deleteExpense(expense.id)}
+              className="text-red-600 hover:text-red-400 p-2 rounded-lg transition-colors duration-300"
+            >
+              삭제
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
